@@ -37,6 +37,7 @@
           <button class="nav-item" data-view="questions"><span class="nav-icon">?</span><span>问题库</span><span class="nav-count warm" id="navQuestionCount">3</span></button>
           <button class="nav-item" data-view="review"><span class="nav-icon">↗</span><span>复盘中心</span></button>
           <button class="nav-item" data-view="history"><span class="nav-icon">◷</span><span>历史档案</span></button>
+          <button class="nav-item" data-view="trash"><span class="nav-icon">▣</span><span>回收站</span></button>
         </nav>
 
         <div class="sidebar-bottom">
@@ -90,6 +91,8 @@
               <button class="button button-primary" data-action="new-task"><span>＋</span> 新建任务</button>
             </div>
           </div>
+
+          <section class="panel memo-panel"><div class="panel-heading compact"><div><h2>📝 我的备忘录</h2><p>快速记下想法，稍后再整理</p></div><button class="text-button" data-view-link="trash">回收站</button></div><textarea id="memoDraft" placeholder="随时记录你的想法、提醒和待办事项…"></textarea><div class="memo-footer"><span id="memoStatus">自动保存到本机</span><button class="button button-primary button-small" data-action="save-memo">保存备忘录</button></div><div id="memoList" class="memo-list"></div></section>
 
           <div class="stats-grid">
             <article class="stat-card stat-card-blue">
