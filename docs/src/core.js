@@ -22,6 +22,7 @@ export function createInitialState(date = DEFAULT_DATE) {
     tasks: [],
     events: [],
     notes: [],
+    memos: [],
     questions: [],
     review: {
       date,
@@ -46,6 +47,9 @@ export function createTask(title, plannedDate = DEFAULT_DATE, options = {}) {
     createdAt: plannedDate,
     completedAt: null,
     tags: options.tags || [],
+    description: options.description || '',
+    deletedAt: null,
+    version: 1,
   };
 }
 
@@ -80,8 +84,38 @@ export function addNote(state, title, body, date = DEFAULT_DATE) {
     recordedAt: date,
     createdAt: date,
     updatedAt: date,
+    deletedAt: null,
+    version: 1,
   };
   return withActivity({ ...state, notes: [note, ...state.notes] }, 'note_created', note.id, date);
+}
+
+export function addMemo(state, body, date = DEFAULT_DATE) {
+  const memo = { id: uid('memo'), title: body.trim().slice(0, 36), body: body.trim(), createdAt: date, updatedAt: date, deletedAt: null, version: 1 };
+  return withActivity({ ...state, memos: [memo, ...(state.memos || [])] }, 'memo_created', memo.id, date);
+}
+
+export function updateEntity(state, collection, entityId, changes, date = DEFAULT_DATE) {
+  if (!['tasks', 'notes', 'memos', 'questions', 'events'].includes(collection)) return state;
+  const updated = (state[collection] || []).map((item) => item.id === entityId ? { ...item, ...changes, updatedAt: date, version: (item.version || 1) + 1 } : item);
+  return withActivity({ ...state, [collection]: updated }, `${collection.slice(0, -1)}_updated`, entityId, date);
+}
+
+export function moveToTrash(state, collection, entityId, date = DEFAULT_DATE) {
+  if (!['tasks', 'notes', 'memos', 'questions', 'events'].includes(collection)) return state;
+  const updated = (state[collection] || []).map((item) => item.id === entityId ? { ...item, deletedAt: date, deleteBatchId: uid('delete'), updatedAt: date } : item);
+  return withActivity({ ...state, [collection]: updated }, `${collection.slice(0, -1)}_deleted`, entityId, date);
+}
+
+export function restoreFromTrash(state, collection, entityId, date = DEFAULT_DATE) {
+  if (!['tasks', 'notes', 'memos', 'questions', 'events'].includes(collection)) return state;
+  const updated = (state[collection] || []).map((item) => item.id === entityId ? { ...item, deletedAt: null, restoredAt: date, updatedAt: date } : item);
+  return withActivity({ ...state, [collection]: updated }, `${collection.slice(0, -1)}_restored`, entityId, date);
+}
+
+export function permanentlyDelete(state, collection, entityId, date = DEFAULT_DATE) {
+  if (!['tasks', 'notes', 'memos', 'questions', 'events'].includes(collection)) return state;
+  return withActivity({ ...state, [collection]: (state[collection] || []).filter((item) => item.id !== entityId) }, `${collection.slice(0, -1)}_purged`, entityId, date);
 }
 
 export function addQuestion(state, title, description, date = DEFAULT_DATE) {
@@ -111,10 +145,10 @@ function isDueSoon(task, selectedDate) {
 
 export function getDashboardStats(state, selectedDate = DEFAULT_DATE) {
   const dayTasks = state.tasks.filter(
-    (task) => task.plannedDate === selectedDate && task.status !== 'cancelled',
+    (task) => !task.deletedAt && task.plannedDate === selectedDate && task.status !== 'cancelled',
   );
   const completed = dayTasks.filter((task) => task.status === 'completed').length;
-  const dueSoon = state.tasks.filter((task) => isDueSoon(task, selectedDate)).length;
+  const dueSoon = state.tasks.filter((task) => !task.deletedAt && isDueSoon(task, selectedDate)).length;
   return {
     total: dayTasks.length,
     completed,
@@ -149,6 +183,7 @@ export function importBackup(serialized) {
     !Array.isArray(data.tasks) ||
     !Array.isArray(data.events) ||
     !Array.isArray(data.notes) ||
+    (data.memos !== undefined && !Array.isArray(data.memos)) ||
     !Array.isArray(data.questions) ||
     !data.review ||
     typeof data.review !== 'object'
@@ -158,6 +193,7 @@ export function importBackup(serialized) {
   return {
     ...createInitialState(data.review.date || DEFAULT_DATE),
     ...clone(data),
+    memos: clone(data.memos || []),
     schemaVersion: 1,
   };
 }
