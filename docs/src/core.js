@@ -123,9 +123,12 @@ export function addQuestion(state, title, description, date = DEFAULT_DATE) {
     id: uid('question'),
     title: title.trim(),
     description: description.trim(),
+    answer: '',
     status: 'open',
     createdAt: date,
     updatedAt: date,
+    deletedAt: null,
+    version: 1,
   };
   return withActivity({ ...state, questions: [question, ...state.questions] }, 'question_created', question.id, date);
 }
