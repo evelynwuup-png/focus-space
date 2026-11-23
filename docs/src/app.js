@@ -200,6 +200,8 @@ function renderDashboard() {
   $('#statTotal').textContent = stats.total;
   $('#statRate').textContent = `${stats.completionRate}% 完成`;
   $('#statProgress').style.width = `${stats.completionRate}%`;
+  $('#statPending').textContent = state.tasks.filter((item) => !item.deletedAt && item.status !== 'completed' && item.status !== 'cancelled').length;
+  $('#statNotes').textContent = state.notes.filter((item) => !item.deletedAt).length;
   $('#statQuestions').textContent = state.questions.filter((item) => item.status !== 'resolved').length;
   $('#navQuestionCount').textContent = state.questions.filter((item) => item.status !== 'resolved').length;
   $('#navTaskCount').textContent = state.tasks.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length;
