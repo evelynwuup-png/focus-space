@@ -92,8 +92,6 @@
             </div>
           </div>
 
-          <section class="panel memo-panel"><div class="panel-heading compact"><div><h2>📝 我的备忘录</h2><p>快速记下想法，稍后再整理</p></div><button class="text-button" data-view-link="trash">回收站</button></div><textarea id="memoDraft" placeholder="随时记录你的想法、提醒和待办事项…"></textarea><div class="memo-footer"><span id="memoStatus">自动保存到本机</span><button class="button button-primary button-small" data-action="save-memo">保存备忘录</button></div><div id="memoList" class="memo-list"></div></section>
-
           <div class="stats-grid">
             <article class="stat-card stat-card-blue">
               <div class="stat-head"><span>今日任务</span><span class="stat-icon">✓</span></div>
@@ -101,19 +99,19 @@
               <div class="stat-foot"><span class="progress-line"><i id="statProgress"></i></span><span id="statRate">67% 完成</span></div>
             </article>
             <article class="stat-card">
-              <div class="stat-head"><span>专注时长</span><span class="stat-icon purple">◷</span></div>
-              <div class="stat-value"><strong>3.5</strong><span>小时</span></div>
-              <div class="stat-foot trend-up">↑ 12% <span>较上周平均</span></div>
+              <div class="stat-head"><span>待办任务</span><span class="stat-icon purple">◷</span></div>
+              <div class="stat-value"><strong id="statPending">0</strong><span>项</span></div>
+              <div class="stat-foot"><span>正在推进</span></div>
             </article>
             <article class="stat-card">
-              <div class="stat-head"><span>本周完成率</span><span class="stat-icon green">↗</span></div>
-              <div class="stat-value"><strong>78</strong><span>%</span></div>
-              <div class="stat-foot"><span class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span>保持节奏</span></div>
+              <div class="stat-head"><span>知识笔记</span><span class="stat-icon green">◇</span></div>
+              <div class="stat-value"><strong id="statNotes">0</strong><span>篇</span></div>
+              <div class="stat-foot"><span>已收录的灵感</span></div>
             </article>
             <article class="stat-card">
               <div class="stat-head"><span>待解决问题</span><span class="stat-icon orange">?</span></div>
-              <div class="stat-value"><strong id="statQuestions">3</strong><span>个</span></div>
-              <div class="stat-foot"><span class="soft-warning">2 个需要跟进</span></div>
+              <div class="stat-value"><strong id="statQuestions">0</strong><span>个</span></div>
+              <div class="stat-foot"><span>继续保持好奇</span></div>
             </article>
           </div>
 
@@ -153,6 +151,8 @@
               </section>
             </aside>
           </div>
+
+          <section class="panel memo-panel"><div class="panel-heading compact"><div><h2>📝 我的备忘录</h2><p>随手记下想法、提醒和待办</p></div><button class="text-button" data-view-link="trash">回收站</button></div><textarea id="memoDraft" placeholder="写下此刻想到的事…"></textarea><div class="memo-footer"><span id="memoStatus">自动保存到本机</span><button class="button button-primary button-small" data-action="save-memo">保存备忘录</button></div><div id="memoList" class="memo-list"></div></section>
 
           <div class="bottom-grid">
             <section class="panel timeline-panel">
