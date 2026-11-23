@@ -204,3 +204,31 @@ h1 { margin-top: 9px; color: var(--ink); font-size: clamp(25px, 3vw, 32px); line
 @media (max-width: 1080px) { .sidebar { width: 222px; flex-basis: 222px; }.topbar, .page-content { padding-right: 26px; padding-left: 26px; }.stats-grid { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 780px) { .sidebar { width: 70px; flex-basis: 70px; padding: 20px 10px 14px; }.brand { justify-content: center; padding-right: 0; padding-left: 0; }.brand > div:not(.brand-mark), .workspace-copy, .chevron, .nav-item span:not(.nav-icon), .sync-card div:nth-child(2), .online-dot, .profile-copy, .more-btn { display: none; }.workspace-switcher { justify-content: center; padding: 8px; }.nav-label { display: none; }.nav-label-spaced { display: block; height: 16px; margin-top: 20px; padding: 0; }.nav-item { justify-content: center; padding: 0; }.nav-icon { font-size: 18px; }.sync-card { justify-content: center; padding: 8px; }.profile-row { justify-content: center; padding-right: 0; padding-left: 0; }.topbar { padding: 0 18px; }.topbar-context { display: none; }.search-box { width: min(245px, 50vw); }.page-content { padding: 27px 18px 38px; }.dashboard-grid, .bottom-grid, .subview-grid { grid-template-columns: 1fr; }.hero-row { align-items: flex-start; flex-direction: column; }.hero-actions { width: 100%; }.hero-actions .button { flex: 1; }.settings-grid { grid-template-columns: 1fr; } }
 @media (max-width: 540px) { .sidebar { width: 58px; flex-basis: 58px; padding-right: 6px; padding-left: 6px; }.brand-mark { width: 30px; height: 30px; }.topbar { min-height: 64px; padding: 0 13px; }.topbar-actions { width: 100%; }.search-box { flex: 1; width: auto; }.search-box kbd, .topbar-actions .icon-button { display: none; }.topbar-avatar { flex: 0 0 auto; }.page-content { padding: 24px 13px 28px; }.stats-grid { gap: 9px; }.stat-card { padding: 14px 13px; }.stat-value strong { font-size: 23px; }.stat-value { margin: 9px 0 7px; }.stat-foot { font-size: 9px; }.panel { padding: 16px; }.task-item { grid-template-columns: 19px minmax(0,1fr); padding: 10px 0; }.task-status { grid-column: 2; justify-self: start; margin-top: -5px; }.note-grid { grid-template-columns: 1fr; }.calendar-cell { min-height: 66px; padding: 5px; }.calendar-cell strong { font-size: 10px; }.calendar-event { overflow: hidden; margin-top: 5px; font-size: 8px; white-space: nowrap; }.form-row { grid-template-columns: 1fr; } }
+
+/* Home: calm blue-white hierarchy, with real data in the first row. */
+#dashboardView { padding-top: 30px; }
+#dashboardView .hero-row { margin-bottom: 22px; }
+#dashboardView .hero-row h1 { font-size: clamp(24px, 2.5vw, 30px); }
+#dashboardView .stats-grid { gap: 12px; margin-bottom: 16px; }
+#dashboardView .stat-card { padding: 15px 17px 14px; border-radius: 15px; box-shadow: 0 5px 18px rgba(52,111,150,.055); }
+#dashboardView .stat-card-blue { background: linear-gradient(140deg,#f2f9ff,#fff 82%); }
+#dashboardView .stat-value { margin: 8px 0 7px; }
+#dashboardView .stat-value strong { font-size: 25px; }
+#dashboardView .dashboard-grid, #dashboardView .bottom-grid { gap: 15px; }
+#dashboardView .panel { border-radius: 16px; box-shadow: 0 5px 18px rgba(52,111,150,.055); }
+#dashboardView .task-panel { padding: 20px 22px; }
+#dashboardView .task-item { min-height: 60px; }
+#dashboardView .right-column { gap: 15px; }
+#dashboardView .memo-panel { margin: 16px 0 0; padding: 19px 21px; border-color: #dcebf7; background: linear-gradient(115deg,#f4f9ff 0%,#fff 68%); }
+#dashboardView .memo-panel textarea { min-height: 60px; resize: vertical; border-color: #e0ebf4; background: rgba(255,255,255,.9); }
+#dashboardView .memo-footer { margin-top: 8px; }
+#dashboardView .memo-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 14px; }
+#dashboardView .memo-row { min-width: 0; align-items: flex-start; gap: 5px; padding: 10px; border: 1px solid #e5eef6; border-radius: 11px; background: rgba(255,255,255,.75); }
+#dashboardView .memo-row > div { gap: 5px; }
+#dashboardView .memo-row span { display: -webkit-box; overflow: hidden; white-space: normal; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.5; }
+#dashboardView .memo-row .item-action { padding: 4px 5px; font-size: 9px; }
+#dashboardView .bottom-grid { margin-top: 15px; }
+@media (max-width: 780px) {
+  #dashboardView { padding-top: 24px; }
+  #dashboardView .memo-list { grid-template-columns: 1fr; }
+}
