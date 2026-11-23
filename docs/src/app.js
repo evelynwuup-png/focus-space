@@ -202,14 +202,14 @@ function renderDashboard() {
   $('#statProgress').style.width = `${stats.completionRate}%`;
   $('#statPending').textContent = state.tasks.filter((item) => !item.deletedAt && item.status !== 'completed' && item.status !== 'cancelled').length;
   $('#statNotes').textContent = state.notes.filter((item) => !item.deletedAt).length;
-  $('#statQuestions').textContent = state.questions.filter((item) => item.status !== 'resolved').length;
-  $('#navQuestionCount').textContent = state.questions.filter((item) => item.status !== 'resolved').length;
+  $('#statQuestions').textContent = state.questions.filter((item) => !item.deletedAt && item.status !== 'resolved').length;
+  $('#navQuestionCount').textContent = state.questions.filter((item) => !item.deletedAt && item.status !== 'resolved').length;
   $('#navTaskCount').textContent = state.tasks.filter((item) => item.status !== 'completed' && item.status !== 'cancelled').length;
   $('#allTaskCount').textContent = state.tasks.filter((item) => item.plannedDate === TODAY && item.status !== 'cancelled').length;
   $('#pendingTaskCount').textContent = state.tasks.filter((item) => item.plannedDate === TODAY && item.status !== 'completed' && item.status !== 'cancelled').length;
   $('#completedTaskCount').textContent = stats.completed;
   $('#noteCount').textContent = `${state.notes.filter((item) => item.recordedAt === TODAY).length} 条新笔记`;
-  $('#questionCount').textContent = `${state.questions.filter((item) => item.status !== 'resolved').length} 个待解决问题`;
+  $('#questionCount').textContent = `${state.questions.filter((item) => !item.deletedAt && item.status !== 'resolved').length} 个待解决问题`;
   $('#reviewHighlight').value = state.review.highlight || '';
   $('#memoList').innerHTML = (state.memos || []).filter((memo) => !memo.deletedAt).slice(0, 3).map((memo) => `<div class="memo-row"><div><strong>${escapeHTML(memo.title)}</strong><span>${escapeHTML(memo.body)}</span></div><button class="item-action" data-edit="memos:${memo.id}">编辑</button><button class="item-action danger" data-trash="memos:${memo.id}">删除</button></div>`).join('');
   renderTasks();
@@ -276,7 +276,10 @@ function viewMarkup(view) {
   }
   if (view === 'calendar') return `<section class="panel calendar-board"><div class="calendar-head"><div><h2>2026 年 11 月</h2><p style="margin-top:5px;color:var(--muted);font-size:11px">周六，11 月 21 日</p></div><div class="calendar-nav"><button>‹</button><button>›</button></div></div><div class="calendar-grid">${calendarCells()}</div></section>`;
   if (view === 'knowledge') return `<div class="note-grid">${state.notes.filter((note) => !note.deletedAt).map((note) => `<article class="note-card"><span class="tag-chip">学习记录</span><h3 style="margin-top:13px">${escapeHTML(note.title)}</h3><p>${escapeHTML(note.body)}</p><div class="note-meta"><span>${formatDate(note.recordedAt)}</span><span><button class="item-action" data-edit="notes:${note.id}">编辑</button><button class="item-action danger" data-trash="notes:${note.id}">删除</button></span></div></article>`).join('')}</div>`;
-  if (view === 'questions') return `<section class="panel"><div class="question-list">${state.questions.map((question) => `<article class="question-card"><div class="question-mark">?</div><div style="min-width:0;flex:1"><h3>${escapeHTML(question.title)}</h3><p>${escapeHTML(question.description)}</p></div><span class="status-pill">${question.status === 'researching' ? '研究中' : '待解决'}</span></article>`).join('')}</div></section>`;
+  if (view === 'questions') {
+    const questions = state.questions.filter((question) => !question.deletedAt);
+    return `<section class="panel"><div class="question-list">${questions.length ? questions.map((question) => `<article class="question-card"><div class="question-mark">?</div><div class="question-main"><div class="question-heading"><div><h3>${escapeHTML(question.title)}</h3><p>${escapeHTML(question.description || '还没有补充背景。')}</p></div><span class="status-pill ${question.status}">${question.status === 'researching' ? '研究中' : question.status === 'resolved' ? '已解决' : '待解决'}</span></div>${question.answer ? `<div class="question-answer"><strong>回答</strong><p>${escapeHTML(question.answer)}</p></div>` : '<div class="question-answer unanswered">还没有回答，知道答案后可以记录下来。</div>'}<div class="question-actions"><button class="item-action" data-edit="questions:${question.id}">编辑问题 / 回答</button><button class="item-action danger" data-trash="questions:${question.id}">移入回收站</button></div></div></article>`).join('') : '<div class="list-empty">还没有记录的问题，可以从一个好奇开始。</div>'}</div></section>`;
+  }
   if (view === 'review') return `<div class="review-list"><section class="panel review-summary"><div class="review-date">每日复盘 · ${formatDate(TODAY)}</div><h3 style="margin-top:9px">今天最重要的成果</h3><p>${escapeHTML(state.review.highlight || '还没有写下今天的成果。')}</p></section><section class="panel review-summary"><div class="review-date">本周复盘</div><h3 style="margin-top:9px">保持清晰，也保持弹性</h3><p>本周完成率 78%，完成 18 项任务，新增 6 条知识笔记，解决 2 个问题。</p></section></div>`;
   if (view === 'history') return `<div class="subview-grid"><section class="panel wide-panel"><div class="panel-heading"><div><h2>最近活动</h2><p>你的工作轨迹会留在这里</p></div></div><div class="timeline">${(state.activity || []).slice(-6).reverse().map((item) => `<div class="timeline-row"><div class="timeline-time">${item.occurredAt.slice(5)}</div><div class="timeline-line"></div><div class="timeline-entry"><strong>${item.action === 'task_toggled' ? '更新了一项任务' : item.action === 'note_created' ? '记录了一条知识' : '记录了一个问题'}</strong><span>本地保存 · ${item.entityId}</span></div></div>`).join('') || '<div class="list-empty">还没有活动记录。</div>'}</div></section><section class="panel"><div class="panel-heading compact"><div><h2>长期积累</h2><p>把注意力放回过程</p></div></div><div class="review-summary"><h3>数据总览</h3><p>任务 ${state.tasks.length} 项 · 笔记 ${state.notes.length} 条 · 问题 ${state.questions.length} 个</p></div></section></div>`;
   if (view === 'trash') return trashMarkup();
@@ -304,7 +307,7 @@ function openComposer(type) {
     task: { eyebrow: '快速安排', title: '新建任务', fields: `<div class="form-field"><label for="composerTitle">任务名称</label><input id="composerTitle" name="title" required placeholder="例如：整理本周广告数据" /></div><div class="form-row"><div class="form-field"><label for="composerDate">计划日期</label><input id="composerDate" name="date" type="date" value="${TODAY}" required /></div><div class="form-field"><label for="composerPriority">优先级</label><select id="composerPriority" name="priority"><option value="high">高优先级</option><option value="medium" selected>中优先级</option><option value="low">低优先级</option></select></div></div><div class="form-field"><label for="composerProject">所属项目</label><input id="composerProject" name="project" value="个人成长" /></div>`, submit: '保存任务' },
     note: { eyebrow: '知识积累', title: '记录一条新知识', fields: `<div class="form-field"><label for="composerTitle">标题</label><input id="composerTitle" name="title" required placeholder="今天学到了什么？" /></div><div class="form-field"><label for="composerBody">内容</label><textarea id="composerBody" name="body" required placeholder="写下可以在未来复用的内容…"></textarea></div>`, submit: '保存笔记' },
     memo: { eyebrow: '快速记录', title: '编辑备忘录', fields: `<div class="form-field"><label for="composerBody">备忘内容</label><textarea id="composerBody" name="body" required></textarea></div>`, submit: '保存备忘录' },
-    question: { eyebrow: '保持好奇', title: '记录一个问题', fields: `<div class="form-field"><label for="composerTitle">问题</label><input id="composerTitle" name="title" required placeholder="什么事情还没有想明白？" /></div><div class="form-field"><label for="composerBody">当前想法</label><textarea id="composerBody" name="body" placeholder="记录当前的假设、线索或下一步…"></textarea></div>`, submit: '保存问题' },
+    question: { eyebrow: '保持好奇', title: '记录一个问题', fields: `<div class="form-field"><label for="composerTitle">问题</label><input id="composerTitle" name="title" required placeholder="什么事情还没有想明白？" /></div><div class="form-field"><label for="composerBody">问题背景 / 当前想法</label><textarea id="composerBody" name="body" placeholder="补充背景、线索或当前假设…"></textarea></div><div class="form-field"><label for="composerAnswer">回答</label><textarea id="composerAnswer" name="answer" placeholder="把你找到的答案记录在这里…"></textarea></div><div class="form-field"><label for="composerStatus">状态</label><select id="composerStatus" name="status"><option value="open">待解决</option><option value="researching">研究中</option><option value="resolved">已解决</option></select></div>`, submit: '保存问题' },
   };
   const config = configs[type];
   $('#modalEyebrow').textContent = config.eyebrow;
@@ -317,14 +320,16 @@ function openComposer(type) {
 function openEditor(collection, id) {
   const item = (state[collection] || []).find((record) => record.id === id);
   if (!item) return;
-  const type = collection === 'tasks' ? 'task' : collection === 'memos' ? 'memo' : 'note';
+  const type = collection === 'tasks' ? 'task' : collection === 'memos' ? 'memo' : collection === 'questions' ? 'question' : 'note';
   openComposer(type);
   $('#modalEyebrow').textContent = '编辑记录';
-  $('#modalTitle').textContent = type === 'task' ? '编辑任务' : type === 'memo' ? '编辑备忘录' : '编辑知识笔记';
+  $('#modalTitle').textContent = type === 'task' ? '编辑任务' : type === 'memo' ? '编辑备忘录' : type === 'question' ? '编辑问题与回答' : '编辑知识笔记';
   const title = $('#composerForm [name="title"]');
   const body = $('#composerForm [name="body"]');
   if (title) title.value = item.title || '';
   if (body) body.value = item.body || item.description || '';
+  const answer = $('#composerForm [name="answer"]'); if (answer) answer.value = item.answer || '';
+  const status = $('#composerForm [name="status"]'); if (status) status.value = item.status || 'open';
   const date = $('#composerForm [name="date"]'); if (date) date.value = item.plannedDate || TODAY;
   const priority = $('#composerForm [name="priority"]'); if (priority) priority.value = item.priority || 'medium';
   const project = $('#composerForm [name="project"]'); if (project) project.value = item.project || '';
@@ -340,12 +345,12 @@ function submitComposer(event) {
   const editId = formData.get('editId');
   if (editId) {
     const collection = formData.get('collection');
-    const changes = type === 'task' ? { title: formData.get('title').trim(), plannedDate: formData.get('date'), priority: formData.get('priority'), project: formData.get('project') } : type === 'memo' ? { title: formData.get('body').trim().slice(0, 36), body: formData.get('body').trim() } : { title: formData.get('title').trim(), body: formData.get('body').trim() };
+    const changes = type === 'task' ? { title: formData.get('title').trim(), plannedDate: formData.get('date'), priority: formData.get('priority'), project: formData.get('project') } : type === 'memo' ? { title: formData.get('body').trim().slice(0, 36), body: formData.get('body').trim() } : type === 'question' ? { title: formData.get('title').trim(), description: formData.get('body').trim(), answer: formData.get('answer').trim(), status: formData.get('status') } : { title: formData.get('title').trim(), body: formData.get('body').trim() };
     state = updateEntity(state, collection, editId, changes, TODAY);
   } else if (type === 'task') state = { ...state, tasks: [createTask(formData.get('title'), formData.get('date'), { priority: formData.get('priority'), project: formData.get('project') }), ...state.tasks] };
   if (!editId && type === 'memo') state = addMemo(state, formData.get('body'), TODAY);
   if (!editId && type === 'note') state = addNote(state, formData.get('title'), formData.get('body'), TODAY);
-  if (type === 'question') state = addQuestion(state, formData.get('title'), formData.get('body'), TODAY);
+  if (!editId && type === 'question') state = addQuestion(state, formData.get('title'), formData.get('body'), TODAY);
   closeComposer();
   persist(editId ? '修改已保存' : type === 'task' ? '任务已创建' : type === 'memo' ? '备忘录已保存' : type === 'note' ? '知识已保存' : '问题已记录');
   render();
